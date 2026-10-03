@@ -80,6 +80,7 @@ public class MainActivity extends BaseActivity {
 			if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
 				uri = intent.getData();
 			}
+			if (uri == null) uri = getBundledGameUri();
 			AppsListFragment fragment = AppsListFragment.newInstance(uri);
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.container, fragment).commit();
@@ -96,8 +97,25 @@ public class MainActivity extends BaseActivity {
 		}
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
-
-	private void checkAndCreateDirs() {
+	
+	private Uri getBundledGameUri() {
+	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	if (prefs.getBoolean("bundled_game_installed", false)) return null;
+	try {
+		File out = new File(getCacheDir(), "game.jar");
+		try (InputStream in = getAssets().open("game.jar");
+			 FileOutputStream os = new FileOutputStream(out)) {
+			byte[] buf = new byte[8192];
+			int n;
+			while ((n = in.read(buf)) > 0) os.write(buf, 0, n);
+		}
+		prefs.edit().putBoolean("bundled_game_installed", true).apply();
+		return Uri.fromFile(out);
+	} catch (IOException e) {
+		return null;
+	}
+	}
+	    private void checkAndCreateDirs() {
 		String emulatorDir = Config.getEmulatorDir();
 		File dir = new File(emulatorDir);
 		if (dir.isDirectory() && dir.canWrite()) {
