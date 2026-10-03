@@ -37,6 +37,9 @@ import com.nononsenseapps.filepicker.Utils;
 
 import java.io.File;
 import java.util.Map;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import ru.playsoftware.j2meloader.applist.AppListModel;
 import ru.playsoftware.j2meloader.applist.AppsListFragment;
