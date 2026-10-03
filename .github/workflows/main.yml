@@ -13,6 +13,15 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - name: Create keystore
+        run: |
+          keytool -genkeypair -keystore $GITHUB_WORKSPACE/release.keystore -alias key0 -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=App"
+          cat > keystore.properties <<EOF
+          storeFile=$GITHUB_WORKSPACE/release.keystore
+          storePassword=123456
+          keyAlias=key0
+          keyPassword=123456
+          EOF
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew
       - run: ./gradlew assembleDebug
